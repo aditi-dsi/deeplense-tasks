@@ -56,4 +56,4 @@ When subjected to complex galaxy morphologies and real telescope noise, both mod
 * **Aux-PINN:** Accuracy degraded to **33.33%** (random guessing). 
 
 **Conclusion**
-The stress test proves that the physical residual loss overpowered the primary classification gradients when exposed to noise (Gradient Domination). Solving this bottleneck via dynamic loss weighting and domain adaptation forms the basis of my proposed GSoC project.
+The stress test proves that the physical residual loss overpowered the primary classification gradients when exposed to noise (Gradient Domination). Solving this bottleneck by exploring techniques like dynamic loss weighting, and domain adaptation, etc. forms the basis of my proposed GSoC project.
