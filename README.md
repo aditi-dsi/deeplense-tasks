@@ -6,6 +6,7 @@ This repository contains my solutions for the ML4SCI DeepLense evaluation tests.
 1. `deeplense-multiclass-classification.ipynb` (Common Task I): Multi-class classification of strong lensing images using standard CNN baselines.
 2. `auxiliary-pinn-classification.ipynb` (Specific Task VII): Implementation of an Auxiliary PINN (AuxPINN) that embeds physical constraints via the `caustics` simulator.
 3. `evaluation-on-real-galaxies.ipynb` (independent-experiment): A domain-shift evaluation testing of ResNet34 and AuxPINN for the sim-to-real gap by overlaying simulated substructures onto real DECals galaxy backgrounds.
+4. `diffusion.ipynb` (Specific Task VIII): Implementation of a custom NanoDiT (Diffusion Transformer) to generate lensing images with explicit mass conservation during inference. (For proposal-2: Physics-Informed Diffusion Models for Gravitational Lensing Simulation)
 
 ---
 
@@ -27,7 +28,7 @@ This repository contains my solutions for the ML4SCI DeepLense evaluation tests.
 
 ---
 
-## Specific Test VII: Physics Informed Neural Network (PINN)
+## Specific Test VII: Physics-Guided ML
 
 **Approach for Integrating Physics Constraints**
 To prevent the model from relying purely on statistical pattern matching, I implemented a dual-head Aux-PINN using the PyTorch `caustics` simulator. 
@@ -45,7 +46,7 @@ To prevent the model from relying purely on statistical pattern matching, I impl
 
 ---
 
-## Domain Shift Stress Test (Real Galaxy Backgrounds)
+### Domain Shift Stress Test (Real Galaxy Backgrounds)
 
 **Objective**
 To evaluate the true robustness of the models, I created a test set by forward-modeling the simulated dark matter substructures onto real background galaxies extracted from the DECals survey `.h5` files.
@@ -53,7 +54,34 @@ To evaluate the true robustness of the models, I created a test set by forward-m
 **Findings & Failure Modes:**
 When subjected to complex galaxy morphologies and real telescope noise, both models failed to generalize, highlighting the core sim-to-real gap:
 * **Baseline ResNet34:** Suffered complete mode collapse (predicted 'vortex' for ~100% of samples).
-* **Aux-PINN:** Accuracy degraded to **33.33%** (random guessing). 
+* **Aux-PINN:** Accuracy degraded to **33.33%** (random guessing).
 
 **Conclusion**
 The stress test proves that the physical residual loss overpowered the primary classification gradients when exposed to noise (Gradient Domination). Solving this bottleneck by exploring techniques like dynamic loss weighting, and domain adaptation, etc. forms the basis of my proposed GSoC project.
+
+## Specific Test VIII: Diffusion Models (For Physics-Informed Diffusion Models project)
+
+**Objective:** To synthesize strong gravitational lensing images using a continuous-time generative model, proving that physical conservation laws can be mathematically enforced during the deep learning generation process.
+
+**Approach & Architecture:**
+* **Dataset:** 10,000 simulated lensing images resized to 64x64 and normalized to [-1, 1].
+* **Backbone:** Built a custom **NanoDiT (Diffusion Transformer)**. The images were divided into 4x4 patches and processed through 6 transformer blocks (hidden dim: 256, heads: 8) using adaptive Layer Normalization (adaLN) for timestep conditioning. 
+* **Training:** Optimized using AdamW (`lr=1e-4`) over 200 epochs on a multi-GPU setup to learn the continuous vector field.
+
+**Physics-Constrained Inference:**
+Standard unconstrained models treat generation as a statistical task, which causes them to hallucinate mass. To fix this, I implemented a custom **Physics-Constrained Sampling** loop:
+* Used a 100-step Euler ODE solver for inference.
+* At every integration step, the physical residual (generated mass vs. expected mass prior) is calculated.
+* The latent trajectory is mathematically projected (`z_proj = z - 0.05 * residual`) to dynamically force the pixels to conserve mass before predicting the next step.
+
+**Results & Analysis:**
+
+Best Validation MSE loss: 0.01795
+
+| Inference Method | FID ↓ | Mass Error (Physical Residual) ↓ |
+| :--- | :--- | :--- |
+| Standard DiT Baseline (Unconstrained) | **25.6673** | 0.013174 |
+| Physics-Constrained Sampling | 42.0216 | **0.004389** |
+
+**Conclusion:**
+By enforcing astrophysical constraints during the Euler integration, the physical mass error was **reduced by ~66.7%**. This highlights the physics gap in standard generative deep learning, forming the foundational motivation for my second GSoC proposal for: Physics-Informed Diffusion Models.
