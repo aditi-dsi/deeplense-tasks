@@ -1,6 +1,6 @@
-# DeepLense GSoC 2026 Evaluation Tasks
+# DeepLense Evaluation Tasks
 
-This repository contains my solutions for the ML4SCI DeepLense evaluation tests. The project explores both standard deep learning and Physics-Informed Neural Networks (PINNs) for gravitational lensing analysis, concluding with a stress test on real-world observational data.
+This repository contains my solutions for the ML4SCI DeepLense evaluation tests. The repository contains notebooks for standard deep learning, Physics-Guided Neural Networks (PINNs) for gravitational lensing analysis and Physics-Informed Diffusion Model for Gravitational Lensing Simulation.
 
 ### Overview of Notebooks
 1. `deeplense-multiclass-classification.ipynb` (Common Task I): Multi-class classification of strong lensing images using standard CNN baselines.
@@ -54,7 +54,7 @@ To evaluate the true robustness of the models, I created a test set by forward-m
 **Findings & Failure Modes:**
 When subjected to complex galaxy morphologies and real telescope noise, both models failed to generalize, highlighting the core sim-to-real gap:
 * **Baseline ResNet34:** Suffered complete mode collapse (predicted 'vortex' for ~100% of samples).
-* **Aux-PINN:** Accuracy degraded to **33.33%** (random guessing).
+* **AuxPINN:** Accuracy degraded to **33.33%** (random guessing).
 
 **Conclusion**
 The stress test proves that the physical residual loss overpowered the primary classification gradients when exposed to noise (Gradient Domination). Solving this bottleneck by exploring techniques like dynamic loss weighting, and domain adaptation, etc. forms the basis of my proposed GSoC project.
