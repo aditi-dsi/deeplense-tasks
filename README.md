@@ -2,6 +2,8 @@
 
 This repository contains my solutions for the ML4SCI DeepLense evaluation tests. The repository contains notebooks for standard deep learning, Physics-Guided Neural Networks (PINNs) for gravitational lensing analysis and Physics-Informed Diffusion Model for Gravitational Lensing Simulation.
 
+> Trained model weights for all experiments: https://drive.google.com/drive/folders/1hwIj6FzJ3MsFlj_IDKLUUn5O8-NIOJyC?usp=sharing
+
 ### Overview of Notebooks
 1. `deeplense-multiclass-classification.ipynb` (Common Task I): Multi-class classification of strong lensing images using standard CNN baselines.
 2. `auxiliary-pinn-classification.ipynb` (Specific Task VII): Implementation of an Auxiliary PINN (AuxPINN) that embeds physical constraints via the `caustics` simulator.
